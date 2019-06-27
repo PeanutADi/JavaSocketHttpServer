@@ -67,7 +67,7 @@ public class HttpServer {
             if(split.length != 3) {
             	contentType = null;
             }
-            else if(split[0].equals("GET")) {
+            else if(split[0].equals("GET") || split[0].equals("HEAD")) {
 
 	            heads = firstLineOfRequest.split(" ");
 	            uri = heads[1];
@@ -126,7 +126,7 @@ public class HttpServer {
 			          }
 			          else {
 			  			StringBuffer error = new StringBuffer();
-						error.append("HTTP/1.1 400 file not found \r\n");
+						error.append("HTTP/1.1 404 file not found \r\n");
 						error.append("Content-Type:text/html \r\n");
 						error.append("Content-Length:20 \r\n").append("\r\n");
 						error.append("<h1 >File Not Found..</h1>");
@@ -141,7 +141,53 @@ public class HttpServer {
 		          }
 		          else {
 			  			StringBuffer error = new StringBuffer();
-						error.append("HTTP/1.1 400 file not found \r\n");
+						error.append("HTTP/1.1 404 file not found \r\n");
+						error.append("Content-Type:text/html \r\n");
+						String myString = new String("\r\n" + "<html>\r\n<body>\r\n<h1>File not found</h1>\r\n</body>\r\n</html>\r\n");
+						error.append("Content-Length:" + myString.length() + "\r\n");
+						error.append(myString);
+						outSocket.write(error.toString().getBytes());
+						outSocket.flush();
+						outSocket.close();
+						System.out.print(error.toString());
+
+		          }
+	          }
+	          else if((contentType.equals("") == false || contentType != null) && split[0].equals("HEAD")) {
+		          OutputStream outSocket = socket.getOutputStream();
+		          //通过HTTP请求中的uri读取相应文件发送给客户端
+		          if(uri.equals("/") == false && uri.equals("\\") == false) {
+			          File file = new File("D:\\Server"+uri);
+			          if(file.exists()) {
+							StringBuffer result = new StringBuffer();
+							result.append("HTTP/1.1 200 ok \r\n");
+							result.append("Content-Language:zh-CN \r\n");
+							// charset=UTF-8 解决中文乱码问题
+							result.append("Content-Type:text/html;charset=UTF-8 \r\n");
+							result.append("Content-Length:" + file.length() + "\r\n");
+							outSocket.write(result.toString().getBytes());
+							outSocket.flush();
+							outSocket.close();
+							System.out.print(result.toString());
+			          }
+			          else {
+			  			StringBuffer error = new StringBuffer();
+						error.append("HTTP/1.1 404 file not found \r\n");
+						error.append("Content-Type:text/html \r\n");
+						error.append("Content-Length:20 \r\n").append("\r\n");
+						error.append("<h1 >File Not Found..</h1>");
+						try {
+							outSocket.write(error.toString().getBytes());
+							outSocket.flush();
+							outSocket.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+			          }
+		          }
+		          else {
+			  			StringBuffer error = new StringBuffer();
+						error.append("HTTP/1.1 404 file not found \r\n");
 						error.append("Content-Type:text/html \r\n");
 						String myString = new String("\r\n" + "<html>\r\n<body>\r\n<h1>File not found</h1>\r\n</body>\r\n</html>\r\n");
 						error.append("Content-Length:" + myString.length() + "\r\n");
@@ -182,7 +228,7 @@ public class HttpServer {
 			          }
 			          else {
 			  			StringBuffer error = new StringBuffer();
-						error.append("HTTP/1.1 400 file not found \r\n");
+						error.append("HTTP/1.1 404 file not found \r\n");
 						error.append("Content-Type:text/html \r\n");
 						error.append("Content-Length:20 \r\n").append("\r\n");
 						error.append("<h1 >File Not Found..</h1>");
