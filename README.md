@@ -1,2 +1,2 @@
 # JavaSocketHttpServer
-Cloud computing final project
+Http server using Java socket
